@@ -18,9 +18,15 @@ namespace JsonDataSetTest
                 //TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects
             };
 
-            var sJson = @"{'FileData':[{'FD_PKey':32,'FD_FileName':'FX-1110216-c1.TXT','FD_FileSize':947,'FD_FileType':1,'FD_FileContent':{'$type':'System.Byte[], System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e','$value':'MTk5OTkgICAgMDA1MDMzNyAxMDAwMDAxMTAwOTA4MSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICANCjI5OTk5ICAgIDAwNSAgICAgMTAwMDAwMTExMDMxMTAwMDAwMDAwMDMzMTAxMDAwNzY3MDAwMDAwMDAwMjAxMDA5OTk5OTg4Mzk5OTkgICAgICAgICAgICAgICAgICAgICAgWjE5OTk5MDAwMCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDk5OTk5ODgzMDAgICAgICAgICAgICAgICAgICAgICAgMTA1MzM3QGxhbmRiYW5rdC5jb20udHcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQoyOTk5OSAgICAwMDUgICAgIDEwMDAwMDExMTAzMTYwMDAwMDAwMDAzMzEwMTAwMDc2NzAwMDAwMDAwMDIwMTAwOTk5OTk4ODM5OTk5ICAgICAgICAgICAgICAgICAgICAgIFoxOTk5OTAwMDAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA5OTk5OTg4MzAxICAgICAgICAgICAgICAgICAgICAgIDEwNTMzN0BsYW5kYmFua3QuY29tLnR3ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KMDA1MDMzNyAxMDAwMDAxMTAwOTA4MDAwMDAwMDAwMDAyMzEwMDAwMDAwMDAwMjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA='},'FD_MasterJsonData':'H4sIAAAAAAAEAI2RwUrEMBRFfyVkLZ2kYexMV9apgguLaEVQXDzbgINpOsQULeJeBHHnD/gDs9T/sX6HL50UZjGKd9eT+15uei8eaAoW8nYhaUxDukV3Qd8cpPgxRRGUYwZ0cZ3VSBkbI8iN9iOcoZAkx7in38HCcCRGnJOvj+fu5YnwMGYsXpmKom609Yu8hODMbYm2I7ScLlQNZVI5X7+NB/3oEbQ53PeTLth0MhFITyzY5nZWl9JzZO49iZGAhGzUOXdOd/Xm8/9olUjKIRMha6lmjTFSF63LlTWVeyzS/blS0vyaCh17hzBX/T8dCxHtKNDlFbZhg6KuAnv3d5zhUt9LfpauwQwqB7/flt3rsvt89z0PjWIHEX28/AGb48qwDQIAAA==','FD_DetailJsonData':null}]}";
-            
-            var oDataSet = JsonConvert.DeserializeObject<DataSet>(sJson);
+            /*
+            有個DataSet物件透過Newtonsoft.Json做了JSON序列化，裡頭有個$Type特別標註了byte[]型別的資料欄位，但反序列化會失敗。
+             * Json 針對DataSet、DataTable這樣的物件做序列化時，在型別上會有前後不一致的問題，
+               例如int型別的column會變long，byte[] 會變成string
+               後來查到 用JsonSerializerSettings宣告來產出$Type標示型別，感覺快成功了，就差反序列話還是會失敗囉
+            */
+            var sJson = @"{'FileData':[{'PKey':33,'FileName':'test.txt','FileSize':56,'FileType':1,'FileContent':{'$type':'System.Byte[], System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e','$value':'dGVzdLT6uNWlzqq6wMmu16S6rmU='}}]}";
+
+            var oDataSet = JsonConvert.DeserializeObject<DataSet>(sJson, setting);
 
             Assert.Pass();
         }
